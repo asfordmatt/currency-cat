@@ -24,7 +24,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "format": "npx biome format --write ./src",
-    "cap": "npm run build && npx cap sync"
+    "cap-sync": "npm run build && npx cap sync",
+    "cap-run": "npx cap run android"
   },
   "browserslist": {
     "production": [
