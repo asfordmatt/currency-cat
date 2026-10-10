@@ -1,0 +1,27 @@
+@use '@carbon/react/scss/theme' as *;
+
+.Convert {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.curr-group {
+  display: flex;
+  flex-direction: row;
+  gap: 8px;
+}
+
+.convert-button.convert-button {
+  inline-size: 9.5rem;
+}
+
+.rate-line {
+  text-align: center;
+  color: $syntax-keyword;
+}
+
+.last-updated {
+  text-align: center;
+  color: $text-placeholder;
+}

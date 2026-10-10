@@ -1,0 +1,75 @@
+@use '@carbon/react/scss/theme' as *;
+@use '@carbon/react/scss/type' as *;
+
+.App {
+  text-align: left;
+  background-color: $background;
+  @include type-style('body-01');
+}
+
+.App :has(.isClearing) {
+  animation: .5s bg-pulse;
+}
+
+@keyframes bg-pulse {
+  0% {
+    background-color: $background;
+  }
+  50% {
+    background-color: $layer-01;
+  }
+  100% {
+    background-color: $background;
+  }
+}
+
+.app-info {
+  color: $text-placeholder;
+  @include type-style('body-01');
+}
+
+.logo-row {
+  padding: 2vw;
+  min-width: 20vw;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.App-logo {
+  height: 60px;
+  width: 60px;
+  color: $syntax-keyword;
+  pointer-events: none;
+  font-size: 60px;  
+  transform-origin: center;
+  text-align: center;
+}
+
+.App-title {
+  color: $syntax-keyword;
+  padding: 4px;
+  @include type-style('heading-05');
+  font-family: 'IBM Plex Serif', 'Georgia', Times, serif;
+  font-weight: 600 !important;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo-forw {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo-rev {
+    animation: App-logo-spin-rev infinite 20s linear;
+  }
+}
+
+.App-header {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+}
