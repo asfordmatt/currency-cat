@@ -8,7 +8,7 @@ export const Presets = ({ callbackFn }) => {
 			<IconButton
 				className="preset-button"
 				kind="secondary"
-				size="sm"
+				size="xs"
 				onClick={() => callbackFn(1)}
 			>
 				1
@@ -16,7 +16,7 @@ export const Presets = ({ callbackFn }) => {
 			<IconButton
 				className="preset-button"
 				kind="secondary"
-				size="sm"
+				size="xs"
 				onClick={() => callbackFn(5)}
 			>
 				5
@@ -24,7 +24,7 @@ export const Presets = ({ callbackFn }) => {
 			<IconButton
 				className="preset-button"
 				kind="secondary"
-				size="sm"
+				size="xs"
 				onClick={() => callbackFn(10)}
 			>
 				10
@@ -32,7 +32,7 @@ export const Presets = ({ callbackFn }) => {
 			<IconButton
 				className="preset-button"
 				kind="secondary"
-				size="sm"
+				size="xs"
 				onClick={() => callbackFn(50)}
 			>
 				50

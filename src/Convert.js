@@ -82,10 +82,12 @@ export const Convert = ({ region }) => {
 
 	const CURR1 = (
 		<div className="curr-group">
+			<span class="fi fi-gb"></span>
 			<TextInput
 				labelText="GBP £"
 				name="GBP"
 				type="number"
+				size="sm"
 				value={
 					gbpValue === 0
 						? eurValue === 0
@@ -102,9 +104,11 @@ export const Convert = ({ region }) => {
 
 	const CURR2 = (
 		<div className="curr-group">
+			<span class="fi fi-us"></span>
 			<TextInput
 				labelText="USD $"
 				type="number"
+				size="sm"
 				value={
 					usdValue === 0
 						? eurValue === 0
@@ -121,9 +125,11 @@ export const Convert = ({ region }) => {
 
 	const CURR3 = (
 		<div className="curr-group">
+			<span class="fi fi-eu"></span>
 			<TextInput
 				labelText="EUR €"
 				type="number"
+				size="sm"
 				value={
 					eurValue === 0
 						? gbpValue === 0

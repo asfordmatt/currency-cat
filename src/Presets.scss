@@ -1,9 +1,10 @@
 .presets-group {
+  margin-top: 4px;
   display: grid;
   justify-content: stretch;
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(2, 1fr);
-  gap: 1px;
+  gap: 2px 5px;
 
   [role="tooltip"] {
     display: none;
