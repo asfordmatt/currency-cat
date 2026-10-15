@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Button, ButtonSet, TextInput } from '@carbon/react'
 
+import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { CapacitorShake } from '@capgo/capacitor-shake'
 
 import { getRates } from './rates.js'
@@ -27,6 +28,7 @@ export const Convert = ({ region }) => {
 	const [isClearing, setIsClearing] = useState(false)
 
 	const fetchRates = async () => {
+		Haptics.vibrate()
 		setIsClearing(true)
 		const rates = await getRates()
 		console.log('rates', rates)
@@ -43,6 +45,7 @@ export const Convert = ({ region }) => {
 	}
 
 	const clearValues = () => {
+		Haptics.vibrate()
 		setIsClearing(true)
 		setGbpValue(0)
 		setUsdValue(0)
@@ -80,6 +83,11 @@ export const Convert = ({ region }) => {
 
 	const handleSelectAll = (evt) => evt.target.select()
 
+	const handlePreset = (preset, currFn) => {
+		Haptics.impact({ style: ImpactStyle.Light })
+		currFn(preset)
+	}
+
 	const CURR1 = (
 		<div className="curr-group">
 			<span class="fi fi-gb"></span>
@@ -98,7 +106,7 @@ export const Convert = ({ region }) => {
 				onClick={handleSelectAll}
 				onChange={(evt) => setGbp(evt.target.value)}
 			/>
-			<Presets callbackFn={(preset) => setGbp(preset)} />
+			<Presets callbackFn={(preset) => handlePreset(preset, setGbp)} />
 		</div>
 	)
 
@@ -119,7 +127,7 @@ export const Convert = ({ region }) => {
 				onClick={handleSelectAll}
 				onChange={(evt) => setUsd(evt.target.value)}
 			/>
-			<Presets callbackFn={(preset) => setUsd(preset)} />
+			<Presets callbackFn={(preset) => handlePreset(preset, setUsd)} />
 		</div>
 	)
 
@@ -140,7 +148,7 @@ export const Convert = ({ region }) => {
 				onClick={handleSelectAll}
 				onChange={(evt) => setEur(evt.target.value)}
 			/>
-			<Presets callbackFn={(preset) => setEur(preset)} />
+			<Presets callbackFn={(preset) => handlePreset(preset, setEur)} />
 		</div>
 	)
 
