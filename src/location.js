@@ -61,7 +61,7 @@ const NON_EURO_EX_UK = [
 
 // map 2-letter country code to currency
 const CURR_MAP = {
-  // Europe excluding Eurozone
+	// Europe excluding Eurozone
 	gb: 'GBP',
 	al: 'ALL',
 	ba: 'BAM',
@@ -82,23 +82,23 @@ const CURR_MAP = {
 	se: 'SEK',
 	ch: 'CHF',
 	tr: 'TRY',
-  ua: 'UAH',
-  // South America
-  ar: 'ARS',
-  bo: 'BOB',
-  br: 'BRL',
-  cl: 'CLP',
-  co: 'COP',
-  ec: 'USD',
-  fk: 'FKP',
-  gf: 'EUR',
-  gy: 'GYD',
-  py: 'PYG',
-  pe: 'PEN',
-  gs: 'GBP',
-  sr: 'SRD',
-  uy: 'UYU',
-  ve: 'VES'
+	ua: 'UAH',
+	// South America
+	ar: 'ARS',
+	bo: 'BOB',
+	br: 'BRL',
+	cl: 'CLP',
+	co: 'COP',
+	ec: 'USD',
+	fk: 'FKP',
+	gf: 'EUR',
+	gy: 'GYD',
+	py: 'PYG',
+	pe: 'PEN',
+	gs: 'GBP',
+	sr: 'SRD',
+	uy: 'UYU',
+	ve: 'VES'
 }
 
 export const getLocation = async () => {
