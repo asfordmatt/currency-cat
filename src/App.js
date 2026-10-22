@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Accordion, AccordionItem, Theme } from '@carbon/react'
 import { Capacitor } from '@capacitor/core'
-import { Geolocation } from '@capacitor/geolocation'
 
-import { getRegion, getLocationInfo } from './location.js'
+import { getLocation } from './location.js'
 import { Convert } from './Convert.js'
 import logo from './currencycat.svg'
 import './App.scss'
@@ -15,24 +14,11 @@ function App() {
 	const [countryCode, setCountryCode] = useState()
 
 	useEffect(() => {
-		Geolocation.getCurrentPosition({
-			enableHighAccuracy: false,
-			timeout: 30000
-		}).then((position) => {
-			if (position?.coords) {
-				setCurrentLocation(position.coords)
-				getLocationInfo(
-					position.coords.latitude,
-					position.coords.longitude
-				).then((loc) => {
-					console.log('getLocationInfo', loc)
-					if (loc.full) {
-						setFullLocation(loc.full)
-						setCountry(loc.country)
-						setCountryCode(loc.code)
-					}
-				})
-			}
+		getLocation().then((locInfo) => {
+			console.log('locInfo', locInfo)
+			setFullLocation(locInfo.full)
+			setCountry(locInfo.country)
+			setCountryCode(locInfo.code)
 		})
 	}, [])
 
@@ -47,7 +33,7 @@ function App() {
 					</div>
 
 					<br />
-					<Convert region={getRegion(countryCode)} />
+					<Convert country={country} countryCode={countryCode} />
 					<br />
 					<Accordion className="app-info">
 						<AccordionItem title="App Info">
@@ -58,8 +44,9 @@ function App() {
 									{currentLocation?.longitude.toFixed(3)})
 								</li>
 								<li>Address: {fullLocation}</li>
-								<li>Country: {country}</li>
-								<li>Region: {getRegion(countryCode)}</li>
+								<li>
+									Country: {country} ({countryCode})
+								</li>
 							</ul>
 						</AccordionItem>
 					</Accordion>

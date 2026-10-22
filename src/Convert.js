@@ -4,26 +4,21 @@ import { Button, ButtonSet, TextInput } from '@carbon/react'
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { CapacitorShake } from '@capgo/capacitor-shake'
 
+import { CurrentCountry } from './CurrentCountry.js'
+import { countryToCurrency } from './location.js'
 import { getRates } from './rates.js'
 import { Presets } from './Presets.js'
 
 import './Convert.scss'
 
-export const Convert = ({ region }) => {
+export const Convert = ({ country, countryCode }) => {
 	const [rateLastUpdate, setRateLastUpdate] = useState()
-	const [gbpUsdRate, setGbpUsdRate] = useState(1.34)
-	const [gbpEurRate, setGbpEurRate] = useState(1.17)
+	const [fieldValues, setFieldValues] = useState({})
+	const [exchangeRates, setExchangeRates] = useState({})
 
-	const convertGbpToUsd = (gbp) => (gbp * gbpUsdRate).toFixed(2)
-	const convertUsdToGbp = (usd) => (usd / gbpUsdRate).toFixed(2)
-	const convertGbpToEur = (gbp) => (gbp * gbpEurRate).toFixed(2)
-	const convertEurToGbp = (eur) => (eur / gbpEurRate).toFixed(2)
-	const convertEurToUsd = (eur) => ((eur / gbpEurRate) * gbpUsdRate).toFixed(2)
-	const convertUsdToEur = (usd) => ((usd / gbpUsdRate) * gbpEurRate).toFixed(2)
-
-	const [gbpValue, setGbpValue] = useState(0)
-	const [eurValue, setEurValue] = useState(0)
-	const [usdValue, setUsdValue] = useState(0)
+	const convertGbpToUsd = (gbp) => (gbp / exchangeRates['GBP']).toFixed(2)
+	const convertGbpToEur = (gbp) =>
+		((exchangeRates['EUR'] * gbp) / exchangeRates['GBP']).toFixed(2)
 
 	const [isClearing, setIsClearing] = useState(false)
 
@@ -32,13 +27,8 @@ export const Convert = ({ region }) => {
 		setIsClearing(true)
 		const rates = await getRates()
 		console.log('rates', rates)
+		setExchangeRates(rates)
 		setRateLastUpdate(new Date())
-		if (rates?.USD) {
-			setGbpUsdRate(rates.USD)
-		}
-		if (rates?.EUR) {
-			setGbpEurRate(rates.EUR)
-		}
 		setTimeout(() => {
 			setIsClearing(false)
 		}, 500)
@@ -47,9 +37,7 @@ export const Convert = ({ region }) => {
 	const clearValues = () => {
 		Haptics.vibrate()
 		setIsClearing(true)
-		setGbpValue(0)
-		setUsdValue(0)
-		setEurValue(0)
+		setFieldValues({})
 		setTimeout(() => {
 			setIsClearing(false)
 		}, 500)
@@ -63,121 +51,74 @@ export const Convert = ({ region }) => {
 		})
 	}, [])
 
-	const setGbp = (gbp) => {
-		setGbpValue(gbp)
-		setUsdValue(0)
-		setEurValue(0)
-	}
-
-	const setUsd = (usd) => {
-		setUsdValue(usd)
-		setGbpValue(0)
-		setEurValue(0)
-	}
-
-	const setEur = (eur) => {
-		setEurValue(eur)
-		setGbpValue(0)
-		setUsdValue(0)
-	}
-
 	const handleSelectAll = (evt) => evt.target.select()
 
-	const handlePreset = (preset, currFn) => {
+	const handlePreset = (presetValue, currency) => {
 		Haptics.impact({ style: ImpactStyle.Light })
-		currFn(preset)
+		setFieldValues({ [currency]: presetValue })
 	}
 
-	const CURR1 = (
-		<div className="curr-group">
-			<span class="fi fi-gb"></span>
-			<TextInput
-				labelText="GBP £"
-				name="GBP"
-				type="number"
-				size="sm"
-				value={
-					gbpValue === 0
-						? eurValue === 0
-							? convertUsdToGbp(usdValue)
-							: convertEurToGbp(eurValue)
-						: gbpValue
-				}
-				onClick={handleSelectAll}
-				onChange={(evt) => setGbp(evt.target.value)}
-			/>
-			<Presets callbackFn={(preset) => handlePreset(preset, setGbp)} />
-		</div>
-	)
+	const getCurrentValue = (currency) => {
+		if (fieldValues[currency] > 0) {
+			return fieldValues[currency]
+		} else {
+			const ref = Object.keys(fieldValues)
+			if (ref.length > 0) {
+				const refCurr = ref[0]
+				const refValue = fieldValues[refCurr]
+				const dollars = refValue / exchangeRates[refCurr]
+				const targetValue = exchangeRates[currency] * dollars
+				console.log(
+					`converting ${refValue} ${refCurr} to ${currency} = ${targetValue}`
+				)
+				return targetValue.toFixed(2)
+			}
+			return 0
+		}
+	}
 
-	const CURR2 = (
-		<div className="curr-group">
-			<span class="fi fi-us"></span>
-			<TextInput
-				labelText="USD $"
-				type="number"
-				size="sm"
-				value={
-					usdValue === 0
-						? eurValue === 0
-							? convertGbpToUsd(gbpValue)
-							: convertEurToUsd(eurValue)
-						: usdValue
-				}
-				onClick={handleSelectAll}
-				onChange={(evt) => setUsd(evt.target.value)}
-			/>
-			<Presets callbackFn={(preset) => handlePreset(preset, setUsd)} />
-		</div>
-	)
-
-	const CURR3 = (
-		<div className="curr-group">
-			<span class="fi fi-eu"></span>
-			<TextInput
-				labelText="EUR €"
-				type="number"
-				size="sm"
-				value={
-					eurValue === 0
-						? gbpValue === 0
-							? convertUsdToEur(usdValue)
-							: convertGbpToEur(gbpValue)
-						: eurValue
-				}
-				onClick={handleSelectAll}
-				onChange={(evt) => setEur(evt.target.value)}
-			/>
-			<Presets callbackFn={(preset) => handlePreset(preset, setEur)} />
-		</div>
-	)
+	const getCurrencyRow = (country) => {
+		const currency = countryToCurrency(country)
+		return (
+			<div className="curr-group">
+				<span class={`fi fi-${country}`}></span>
+				<TextInput
+					labelText={currency}
+					name={currency}
+					type="number"
+					size="sm"
+					value={getCurrentValue(currency)}
+					onClick={handleSelectAll}
+					onChange={(evt) => setFieldValues({ [currency]: evt.target.value })}
+				/>
+				<Presets callbackFn={(preset) => handlePreset(preset, currency)} />
+			</div>
+		)
+	}
 
 	return (
 		<div className={`Convert ${isClearing ? 'isClearing' : ''}`}>
 			<h4 className="rate-line">
-				£1 &nbsp;→&nbsp; €{convertGbpToEur(1)} &nbsp;→&nbsp; $
-				{convertGbpToUsd(1)}
+				{Object.keys(exchangeRates).length > 0 && (
+					<>
+						£1 &nbsp;→&nbsp; €{convertGbpToEur(1)} &nbsp;→&nbsp; $
+						{convertGbpToUsd(1)}
+					</>
+				)}
 			</h4>
-			{region === 'UK' && (
-				<>
-					{CURR1}
-					{CURR3}
-					{CURR2}
-				</>
+			{countryCode && (
+				<CurrentCountry country={country} countryCode={countryCode}>
+					{getCurrencyRow(countryCode)}
+				</CurrentCountry>
 			)}
-			{region === 'Europe' && (
-				<>
-					{CURR3}
-					{CURR2}
-					{CURR1}
-				</>
+			{countryCode !== 'gb' && (
+				<CurrentCountry>{getCurrencyRow('gb')}</CurrentCountry>
 			)}
-			{region !== 'UK' && region !== 'Europe' && (
-				<>
-					{CURR2}
-					{CURR3}
-					{CURR1}
-				</>
+			{countryCode !== 'eu' && (
+				<CurrentCountry>{getCurrencyRow('eu')}</CurrentCountry>
+			)}
+			{countryCode !== 'us' && (
+				<CurrentCountry>{getCurrencyRow('us')}</CurrentCountry>
 			)}
 			<ButtonSet>
 				<Button

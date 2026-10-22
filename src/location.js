@@ -1,27 +1,13 @@
-export const __getRegion = (latitude, longitude) => {
-	if (typeof latitude === 'undefined' || typeof longitude === 'undefined') {
-		return 'Unknown'
-	}
-	if (
-		latitude > 49.8 &&
-		latitude < 59.5 &&
-		longitude > -6.2 &&
-		longitude < 1.96
-	) {
-		return 'UK'
-	}
-	if (
-		latitude > 35.4 &&
-		latitude < 70.8 &&
-		longitude > -25.8 &&
-		longitude < 32.1
-	) {
-		return 'Europe'
-	}
-	return 'Rest of World'
-}
+import { Geolocation } from '@capacitor/geolocation'
 
+// set these to override location info for testing purposes only
+const FAKE_COUNTRY = ''
+const FAKE_COUNTRY_CODE = ''
+
+// Countries using Euros as their primary currency
 const EUROZONE = [
+	'eu', // not a country, but included as a special case for the "EU" preset
+	'ad',
 	'at',
 	'be',
 	'bg',
@@ -38,6 +24,7 @@ const EUROZONE = [
 	'lv',
 	'lt',
 	'lu',
+	'me',
 	'mt',
 	'nl',
 	'pt',
@@ -51,9 +38,7 @@ const EUROZONE = [
 
 const NON_EURO_EX_UK = [
 	'al',
-	'ad',
 	'ba',
-	'bg',
 	'cz',
 	'dk',
 	'fo',
@@ -62,7 +47,6 @@ const NON_EURO_EX_UK = [
 	'is',
 	'li',
 	'md',
-	'me',
 	'mk',
 	'no',
 	'pl',
@@ -75,6 +59,78 @@ const NON_EURO_EX_UK = [
 	'ua'
 ]
 
+// map 2-letter country code to currency
+const CURR_MAP = {
+  // Europe excluding Eurozone
+	gb: 'GBP',
+	al: 'ALL',
+	ba: 'BAM',
+	cz: 'CZK',
+	dk: 'DKK',
+	fo: 'DKK',
+	gi: 'GIP',
+	hu: 'HUF',
+	is: 'ISK',
+	li: 'CHF',
+	md: 'MDL',
+	mk: 'MKD',
+	no: 'NOK',
+	pl: 'PLN',
+	ro: 'RON',
+	ru: 'RUB',
+	rs: 'RSD',
+	se: 'SEK',
+	ch: 'CHF',
+	tr: 'TRY',
+  ua: 'UAH',
+  // South America
+  ar: 'ARS',
+  bo: 'BOB',
+  br: 'BRL',
+  cl: 'CLP',
+  co: 'COP',
+  ec: 'USD',
+  fk: 'FKP',
+  gf: 'EUR',
+  gy: 'GYD',
+  py: 'PYG',
+  pe: 'PEN',
+  gs: 'GBP',
+  sr: 'SRD',
+  uy: 'UYU',
+  ve: 'VES'
+}
+
+export const getLocation = async () => {
+	const position = await Geolocation.getCurrentPosition({
+		enableHighAccuracy: false,
+		timeout: 30000
+	})
+
+	let locInfo = {}
+	if (position?.coords) {
+		locInfo.coords = position.coords
+		const loc = await lookupAddress(
+			position.coords.latitude,
+			position.coords.longitude
+		)
+		console.log('getLocationInfo', loc)
+		locInfo.full = loc.full
+		locInfo.country = FAKE_COUNTRY || loc.country
+		locInfo.code = FAKE_COUNTRY_CODE || loc.code
+		return locInfo
+	}
+}
+
+export const countryToCurrency = (country_code) => {
+	if (EUROZONE.includes(country_code)) {
+		return 'EUR'
+	} else if (CURR_MAP[country_code]) {
+		return CURR_MAP[country_code]
+	}
+	return 'USD' // default
+}
+
 export const getRegion = (country_code) => {
 	if (country_code === 'gb') {
 		return 'UK'
@@ -85,7 +141,8 @@ export const getRegion = (country_code) => {
 	}
 	return 'Rest of World'
 }
-export const getLocationInfo = async (latitude, longitude) => {
+
+const lookupAddress = async (latitude, longitude) => {
 	try {
 		const response = await fetch(
 			`https://nominatim.openstreetmap.org/reverse?lat=${latitude}&lon=${longitude}&format=json`
