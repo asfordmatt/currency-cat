@@ -21,8 +21,12 @@
   }
 }
 
-.convert-button.convert-button {
-  inline-size: 9.5rem;
+.button-set {
+  display: flex;
+}
+
+.convert-button {
+  flex: 1;
 }
 
 .rate-line {

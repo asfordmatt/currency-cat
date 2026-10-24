@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button, ButtonSet, TextInput } from '@carbon/react'
+import { ChartLine, Reset } from '@carbon/react/icons'
 
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { CapacitorShake } from '@capgo/capacitor-shake'
@@ -120,10 +121,12 @@ export const Convert = ({ country, countryCode }) => {
 			{countryCode !== 'us' && (
 				<CurrentCountry>{getCurrencyRow('us')}</CurrentCountry>
 			)}
-			<ButtonSet>
+			<br />
+			<ButtonSet className="button-set">
 				<Button
 					className="convert-button"
 					kind="secondary"
+					renderIcon={Reset}
 					onClick={() => {
 						clearValues()
 					}}
@@ -133,6 +136,7 @@ export const Convert = ({ country, countryCode }) => {
 				<Button
 					className="convert-button"
 					kind="secondary"
+					renderIcon={ChartLine}
 					onClick={() => {
 						fetchRates()
 					}}
@@ -140,6 +144,7 @@ export const Convert = ({ country, countryCode }) => {
 					Get Rates
 				</Button>
 			</ButtonSet>
+
 			<p className="last-updated">
 				Rates last updated: {rateLastUpdate?.toLocaleString()}
 			</p>

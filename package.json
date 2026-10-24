@@ -10,6 +10,7 @@
     "@capacitor/haptics": "^8.0.2",
     "@capacitor/ios": "^8.5.3",
     "@capgo/capacitor-shake": "^8.0.44",
+    "@carbon-labs/react-theme-settings": "^0.30.0",
     "@carbon/react": "^1.116.0",
     "@testing-library/dom": "^10.4.1",
     "@testing-library/jest-dom": "^6.9.1",

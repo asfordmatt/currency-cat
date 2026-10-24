@@ -28,8 +28,19 @@
   @include type-style('body-01');
 }
 
+.header-block {
+  display: flex;
+  flex-direction: column;
+  
+  .button-row {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+  }
+}
+
 .logo-row {
-  padding: 2vw;
+  padding: 1vw;
   min-width: 20vw;
   display: flex;
   flex-direction: row;
@@ -44,6 +55,18 @@
   font-size: 60px;  
   transform-origin: center;
   text-align: center;
+
+  #logo-currency {
+    fill: $link-inverse;
+  }
+
+  #logo-cat-primary {
+    fill: $text-primary;
+  }
+
+  #logo-cat-secondary {
+    fill: $layer-hover-01;
+  }
 }
 
 .App-title {
