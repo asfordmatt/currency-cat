@@ -28,6 +28,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
+    "lint": "npx biome lint ./src",
     "format": "npx biome format --write ./src",
     "cap-sync": "npm run build && npx cap sync",
     "cap-run": "npx cap run android"

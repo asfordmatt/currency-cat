@@ -1,5 +1,3 @@
-import React from 'react'
-
 const CurrencycatLogo = (props) => (
 	<svg width={2048} height={1704} viewBox="0 0 2048 1704" {...props}>
 		<title>{`Currency Cat`}</title>

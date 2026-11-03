@@ -154,7 +154,7 @@ const lookupAddress = async (latitude, longitude) => {
 			country: data.address?.country,
 			code: data.address?.country_code
 		}
-	} catch (e) {
+	} catch (_e) {
 		return {}
 	}
 }
