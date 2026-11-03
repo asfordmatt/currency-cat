@@ -41,7 +41,8 @@ export const Convert = ({ country, countryCode }) => {
 	}
 
 	const getCurrentValue = (currency) => {
-		if (fieldValues[currency] > 0) {
+		// the field being edited shows exactly what was typed, including ''
+		if (currency in fieldValues) {
 			return fieldValues[currency]
 		}
 		const [refCurrency] = Object.keys(fieldValues)
