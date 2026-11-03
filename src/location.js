@@ -107,7 +107,7 @@ export const getLocation = async () => {
 		timeout: 30000
 	})
 
-	let locInfo = {}
+	const locInfo = {}
 	if (position?.coords) {
 		locInfo.coords = position.coords
 		const loc = await lookupAddress(
