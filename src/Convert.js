@@ -1,58 +1,39 @@
-import { useEffect, useState } from 'react'
-import { Button, ButtonSet, TextInput } from '@carbon/react'
+import { useCallback, useEffect, useState } from 'react'
+import { Button, ButtonSet } from '@carbon/react'
 import { ChartLine, Reset } from '@carbon/react/icons'
 
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { CapacitorShake } from '@capgo/capacitor-shake'
 
+import { CurrencyRow } from './CurrencyRow.js'
 import { CurrentCountry } from './CurrentCountry.js'
 import { countryToCurrency } from './location.js'
-import { getRates } from './rates.js'
-import { Presets } from './Presets.js'
+import { convertAmount } from './rates.js'
+import { useClearingFlash } from './useClearingFlash.js'
+import { useExchangeRates } from './useExchangeRates.js'
 
 import './Convert.scss'
 
+const DEFAULT_COUNTRIES = ['gb', 'eu', 'us']
+
 export const Convert = ({ country, countryCode }) => {
-	const [rateLastUpdate, setRateLastUpdate] = useState()
 	const [fieldValues, setFieldValues] = useState({})
-	const [exchangeRates, setExchangeRates] = useState({})
+	const { exchangeRates, lastUpdated, refresh } = useExchangeRates()
+	const [isClearing, flash] = useClearingFlash()
 
-	const convertGbpToUsd = (gbp) => (gbp / exchangeRates['GBP']).toFixed(2)
-	const convertGbpToEur = (gbp) =>
-		((exchangeRates['EUR'] * gbp) / exchangeRates['GBP']).toFixed(2)
+	const fetchRates = () => flash(refresh)
 
-	const [isClearing, setIsClearing] = useState(false)
-
-	const fetchRates = async () => {
-		Haptics.vibrate()
-		setIsClearing(true)
-		const rates = await getRates()
-		console.log('rates', rates)
-		setExchangeRates(rates)
-		setRateLastUpdate(new Date())
-		setTimeout(() => {
-			setIsClearing(false)
-		}, 500)
-	}
-
-	const clearValues = () => {
-		Haptics.vibrate()
-		setIsClearing(true)
-		setFieldValues({})
-		setTimeout(() => {
-			setIsClearing(false)
-		}, 500)
-	}
+	const clearValues = useCallback(
+		() => flash(() => setFieldValues({})),
+		[flash]
+	)
 
 	useEffect(() => {
-		fetchRates()
-		CapacitorShake.addListener('shake', () => {
-			console.log('Shake detected!')
-			clearValues()
-		})
-	}, [])
-
-	const handleSelectAll = (evt) => evt.target.select()
+		const listener = CapacitorShake.addListener('shake', clearValues)
+		return () => {
+			listener.then((handle) => handle.remove())
+		}
+	}, [clearValues])
 
 	const handlePreset = (presetValue, currency) => {
 		Haptics.impact({ style: ImpactStyle.Light })
@@ -62,74 +43,65 @@ export const Convert = ({ country, countryCode }) => {
 	const getCurrentValue = (currency) => {
 		if (fieldValues[currency] > 0) {
 			return fieldValues[currency]
-		} else {
-			const ref = Object.keys(fieldValues)
-			if (ref.length > 0) {
-				const refCurr = ref[0]
-				const refValue = fieldValues[refCurr]
-				const dollars = refValue / exchangeRates[refCurr]
-				const targetValue = exchangeRates[currency] * dollars
-				console.log(
-					`converting ${refValue} ${refCurr} to ${currency} = ${targetValue}`
-				)
-				return targetValue.toFixed(2)
-			}
-			return 0
 		}
+		const [refCurrency] = Object.keys(fieldValues)
+		if (refCurrency) {
+			const converted = convertAmount(
+				exchangeRates,
+				fieldValues[refCurrency],
+				refCurrency,
+				currency
+			)
+			if (converted !== undefined) {
+				return converted.toFixed(2)
+			}
+		}
+		return 0
 	}
 
-	const getCurrencyRow = (country) => {
-		const currency = countryToCurrency(country)
+	const formatGbpTo = (currency) =>
+		convertAmount(exchangeRates, 1, 'GBP', currency)?.toFixed(2)
+
+	const renderRow = (rowCountry) => {
+		const currency = countryToCurrency(rowCountry)
 		return (
-			<div className="curr-group">
-				<span class={`fi fi-${country}`}></span>
-				<TextInput
-					labelText={currency}
-					name={currency}
-					type="number"
-					size="sm"
-					value={getCurrentValue(currency)}
-					onClick={handleSelectAll}
-					onChange={(evt) => setFieldValues({ [currency]: evt.target.value })}
-				/>
-				<Presets callbackFn={(preset) => handlePreset(preset, currency)} />
-			</div>
+			<CurrencyRow
+				country={rowCountry}
+				currency={currency}
+				value={getCurrentValue(currency)}
+				onChange={(value) => setFieldValues({ [currency]: value })}
+				onPreset={(preset) => handlePreset(preset, currency)}
+			/>
 		)
 	}
+
+	const otherCountries = DEFAULT_COUNTRIES.filter((c) => c !== countryCode)
 
 	return (
 		<div className={`Convert ${isClearing ? 'isClearing' : ''}`}>
 			<h4 className="rate-line">
 				{Object.keys(exchangeRates).length > 0 && (
 					<>
-						£1 &nbsp;→&nbsp; €{convertGbpToEur(1)} &nbsp;→&nbsp; $
-						{convertGbpToUsd(1)}
+						£1 &nbsp;→&nbsp; €{formatGbpTo('EUR')} &nbsp;→&nbsp; $
+						{formatGbpTo('USD')}
 					</>
 				)}
 			</h4>
 			{countryCode && (
 				<CurrentCountry country={country} countryCode={countryCode}>
-					{getCurrencyRow(countryCode)}
+					{renderRow(countryCode)}
 				</CurrentCountry>
 			)}
-			{countryCode !== 'gb' && (
-				<CurrentCountry>{getCurrencyRow('gb')}</CurrentCountry>
-			)}
-			{countryCode !== 'eu' && (
-				<CurrentCountry>{getCurrencyRow('eu')}</CurrentCountry>
-			)}
-			{countryCode !== 'us' && (
-				<CurrentCountry>{getCurrencyRow('us')}</CurrentCountry>
-			)}
+			{otherCountries.map((c) => (
+				<CurrentCountry key={c}>{renderRow(c)}</CurrentCountry>
+			))}
 			<br />
 			<ButtonSet className="button-set">
 				<Button
 					className="convert-button"
 					kind="secondary"
 					renderIcon={Reset}
-					onClick={() => {
-						clearValues()
-					}}
+					onClick={clearValues}
 				>
 					Clear
 				</Button>
@@ -137,16 +109,14 @@ export const Convert = ({ country, countryCode }) => {
 					className="convert-button"
 					kind="secondary"
 					renderIcon={ChartLine}
-					onClick={() => {
-						fetchRates()
-					}}
+					onClick={fetchRates}
 				>
 					Get Rates
 				</Button>
 			</ButtonSet>
 
 			<p className="last-updated">
-				Rates last updated: {rateLastUpdate?.toLocaleString()}
+				Rates last updated: {lastUpdated?.toLocaleString()}
 			</p>
 		</div>
 	)
