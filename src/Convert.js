@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
 import { Button, ButtonSet } from '@carbon/react'
-import { ChartLine, Reset } from '@carbon/react/icons'
+import { Add, ChartLine, Reset } from '@carbon/react/icons'
 
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
 import { CapacitorShake } from '@capgo/capacitor-shake'
 
+import { AddCurrencyModal } from './AddCurrencyModal.js'
 import { CurrencyRow } from './CurrencyRow.js'
 import { CurrentCountry } from './CurrentCountry.js'
 import { countryToCurrency } from './location.js'
@@ -18,6 +19,8 @@ const DEFAULT_COUNTRIES = ['gb', 'eu', 'us']
 
 export const Convert = ({ country, countryCode }) => {
 	const [fieldValues, setFieldValues] = useState({})
+	const [showAddDialog, setShowAddDialog] = useState(false)
+	const [extraCurrency, setExtraCurrency] = useState()
 	const { exchangeRates, lastUpdated, refresh } = useExchangeRates()
 	const [isClearing, flash] = useClearingFlash()
 
@@ -77,6 +80,10 @@ export const Convert = ({ country, countryCode }) => {
 	}
 
 	const otherCountries = DEFAULT_COUNTRIES.filter((c) => c !== countryCode)
+	if (extraCurrency) {
+		otherCountries.push(extraCurrency)
+	}
+	console.log('otherCountries', otherCountries)
 
 	return (
 		<div className={`Convert ${isClearing ? 'isClearing' : ''}`}>
@@ -96,6 +103,15 @@ export const Convert = ({ country, countryCode }) => {
 			{otherCountries.map((c) => (
 				<CurrentCountry key={c}>{renderRow(c)}</CurrentCountry>
 			))}
+			<br />
+			<Button
+				className="convert-button"
+				kind="secondary"
+				renderIcon={Add}
+				onClick={() => setShowAddDialog(true)}
+			>
+				Add Currency
+			</Button>
 			<br />
 			<ButtonSet className="button-set">
 				<Button
@@ -119,6 +135,18 @@ export const Convert = ({ country, countryCode }) => {
 			<p className="last-updated">
 				Rates last updated: {lastUpdated?.toLocaleString()}
 			</p>
+			{showAddDialog && (
+				<AddCurrencyModal
+					showModal={showAddDialog}
+					handleClose={(selected) => {
+						setShowAddDialog(false)
+						console.log('add curr', selected)
+						if (selected) {
+							setExtraCurrency(selected)
+						}
+					}}
+				></AddCurrencyModal>
+			)}
 		</div>
 	)
 }

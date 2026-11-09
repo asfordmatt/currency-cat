@@ -4,6 +4,25 @@ import { Geolocation } from '@capacitor/geolocation'
 const FAKE_COUNTRY = ''
 const FAKE_COUNTRY_CODE = ''
 
+const NORTH_AMERICA = ['us', 'ca', 'mx']
+
+const SOUTH_AMERICA = [
+	'ar',
+	'bo',
+	'br',
+	'cl',
+	'co',
+	'ec',
+	'fk',
+	'gf',
+	'gy',
+	'py',
+	'pe',
+	'sr',
+	'uy',
+	've'
+]
+
 // Countries using Euros as their primary currency
 const EUROZONE = [
 	'eu', // not a country, but included as a special case for the "EU" preset
@@ -18,7 +37,7 @@ const EUROZONE = [
 	'fr',
 	'de',
 	'gr',
-	'el',
+	// 'el',
 	'ie',
 	'it',
 	'lv',
@@ -61,6 +80,10 @@ const NON_EURO_EX_UK = [
 
 // map 2-letter country code to currency
 const CURR_MAP = {
+	// North America
+	us: 'USD',
+	ca: 'CAD',
+	mx: 'MXN',
 	// Europe excluding Eurozone
 	gb: 'GBP',
 	al: 'ALL',
@@ -95,10 +118,84 @@ const CURR_MAP = {
 	gy: 'GYD',
 	py: 'PYG',
 	pe: 'PEN',
-	gs: 'GBP',
+	gs: 'FKP',
 	sr: 'SRD',
 	uy: 'UYU',
 	ve: 'VES'
+}
+
+// map 2-letter country code to name (in English)
+const COUNTRY_NAMES = {
+	// North America
+	us: 'United States',
+	ca: 'Canada',
+	mx: 'Mexico',
+	// South America
+	ar: 'Argentina',
+	bo: 'Bolivia',
+	br: 'Brazil',
+	cl: 'Chile',
+	co: 'Colombia',
+	ec: 'Ecuador',
+	fk: 'Falkland Islands',
+	gf: 'French Guiana',
+	gy: 'Guyana',
+	py: 'Paraguay',
+	pe: 'Peru',
+	gs: 'South Georgia and the South Sandwich Islands',
+	sr: 'Suriname',
+	uy: 'Uruguay',
+	ve: 'Venezuela',
+	// Europe - Eurozone
+	eu: 'European Union',
+	ad: 'Andorra',
+	at: 'Austria',
+	be: 'Belgium',
+	bg: 'Bulgaria',
+	hr: 'Croatia',
+	cy: 'Cyprus',
+	ee: 'Estonia',
+	fi: 'Finland',
+	fr: 'France',
+	de: 'Germany',
+	gr: 'Greece',
+	el: 'Greece',
+	ie: 'Ireland',
+	it: 'Italy',
+	lv: 'Latvia',
+	lt: 'Lithuania',
+	lu: 'Luxembourg',
+	me: 'Montenegro',
+	mt: 'Malta',
+	nl: 'Netherlands',
+	pt: 'Portugal',
+	sk: 'Slovakia',
+	si: 'Slovenia',
+	es: 'Spain',
+	mc: 'Monaco',
+	va: 'Vatican City',
+	sm: 'San Marino',
+	// Europe - non-Eurozone
+	al: 'Albania',
+	ba: 'Bosnia and Herzegovina',
+	cz: 'Czech Republic / Czechia',
+	dk: 'Denmark',
+	fo: 'Faroe Islands',
+	gi: 'Gibraltar',
+	hu: 'Hungary',
+	is: 'Iceland',
+	li: 'Liechtenstein',
+	md: 'Moldova',
+	mk: 'North Macedonia',
+	no: 'Norway',
+	pl: 'Poland',
+	ro: 'Romania',
+	ru: 'Russia',
+	rs: 'Serbia',
+	se: 'Sweden',
+	ch: 'Switzerland',
+	tr: 'Turkey / Türkiye',
+	ua: 'Ukraine'
 }
 
 export const getLocation = async () => {
@@ -129,6 +226,36 @@ export const countryToCurrency = (country_code) => {
 		return CURR_MAP[country_code]
 	}
 	return 'USD' // default
+}
+
+export const getListByRegion = (region) => {
+	const objForCountry = (country) => {
+		return {
+			countryCode: country,
+			countryName: COUNTRY_NAMES[country],
+			currency: countryToCurrency(country)
+		}
+	}
+
+	const list = []
+	if (region === 'europe') {
+		EUROZONE.forEach((country) => {
+			list.push(objForCountry(country))
+		})
+		NON_EURO_EX_UK.forEach((country) => {
+			list.push(objForCountry(country))
+		})
+	} else if (region === 'na') {
+		NORTH_AMERICA.forEach((country) => {
+			list.push(objForCountry(country))
+		})
+	} else if (region === 'sa') {
+		SOUTH_AMERICA.forEach((country) => {
+			list.push(objForCountry(country))
+		})
+	}
+	// console.log('list', list)
+	return list
 }
 
 export const getRegion = (country_code) => {
