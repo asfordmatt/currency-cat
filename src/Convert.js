@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { Button, ButtonSet } from '@carbon/react'
+import { Button } from '@carbon/react'
 import { Add, ChartLine, Reset } from '@carbon/react/icons'
 
 import { Haptics, ImpactStyle } from '@capacitor/haptics'
@@ -103,20 +103,13 @@ export const Convert = ({ country, countryCode }) => {
 			{otherCountries.map((c) => (
 				<CurrentCountry key={c}>{renderRow(c)}</CurrentCountry>
 			))}
+
 			<br />
-			<Button
-				className="convert-button"
-				kind="secondary"
-				renderIcon={Add}
-				onClick={() => setShowAddDialog(true)}
-			>
-				Add Currency
-			</Button>
-			<br />
-			<ButtonSet className="button-set">
+
+			<div>
 				<Button
 					className="convert-button"
-					kind="secondary"
+					kind="tertiary"
 					renderIcon={Reset}
 					onClick={clearValues}
 				>
@@ -124,13 +117,21 @@ export const Convert = ({ country, countryCode }) => {
 				</Button>
 				<Button
 					className="convert-button"
-					kind="secondary"
+					kind="tertiary"
 					renderIcon={ChartLine}
 					onClick={fetchRates}
 				>
-					Get Rates
+					Rates
 				</Button>
-			</ButtonSet>
+				<Button
+					className="add-curr-button"
+					kind="secondary"
+					renderIcon={Add}
+					onClick={() => setShowAddDialog(true)}
+				>
+					Add
+				</Button>
+			</div>
 
 			<p className="last-updated">
 				Rates last updated: {lastUpdated?.toLocaleString()}

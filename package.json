@@ -48,6 +48,7 @@
   "devDependencies": {
     "@biomejs/biome": "2.5.15",
     "@capacitor/assets": "^3.0.5",
-    "@capacitor/cli": "^8.5.2"
+    "@capacitor/cli": "^8.5.2",
+    "sass": "^1.108.1"
   }
 }

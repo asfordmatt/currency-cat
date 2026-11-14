@@ -44,6 +44,7 @@ export const AddCurrencyModal = ({ showModal, handleClose }) => {
 		>
 			<h3>Add Country / Currency</h3>
 			<br />
+			<br />
 			<TileGroup
 				onChange={(curr) => {
 					setSelectedCurrency(curr)
@@ -65,6 +66,7 @@ export const AddCurrencyModal = ({ showModal, handleClose }) => {
 							{getListByRegion('sa').map((item) => getTile(item))}
 						</div>
 					</AccordionItem>
+					<AccordionItem title="Asia"></AccordionItem>
 				</Accordion>
 			</TileGroup>
 		</Modal>

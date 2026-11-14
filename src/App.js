@@ -57,7 +57,7 @@ function App() {
 						<div className="button-row">
 							<IconButton
 								className="settings-button"
-								size="sm"
+								size="md"
 								label="Information"
 								kind="ghost"
 								onClick={() => setAboutOpen(!aboutOpen)}
@@ -67,7 +67,7 @@ function App() {
 							<Popover open={settingsOpen} align="bottom-end">
 								<IconButton
 									className="settings-button"
-									size="sm"
+									size="md"
 									label="Theme"
 									kind="ghost"
 									onClick={() => setSettingsOpen(!settingsOpen)}
