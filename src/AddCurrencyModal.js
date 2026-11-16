@@ -60,13 +60,16 @@ export const AddCurrencyModal = ({ showModal, handleClose }) => {
 						<div className="country-grid">
 							{getListByRegion('na').map((item) => getTile(item))}
 						</div>
-					</AccordionItem>
+          </AccordionItem>
+          <AccordionItem title="Central America"></AccordionItem>
 					<AccordionItem title="South America">
 						<div className="country-grid">
 							{getListByRegion('sa').map((item) => getTile(item))}
 						</div>
-					</AccordionItem>
-					<AccordionItem title="Asia"></AccordionItem>
+          </AccordionItem>
+          <AccordionItem title="Asia"></AccordionItem>
+          <AccordionItem title="Africa"></AccordionItem>
+          <AccordionItem title="Oceania"></AccordionItem>
 				</Accordion>
 			</TileGroup>
 		</Modal>

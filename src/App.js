@@ -100,9 +100,12 @@ function App() {
 						onRequestClose={() => setAboutOpen(false)}
 						onRequestSubmit={() => setAboutOpen(false)}
 					>
-						<h3>Currency Cat</h3>
-						<h5>version 0.2.0</h5>
-						<br />
+						<h2>Currency Cat</h2>
+            <h5>version 0.2.1</h5>
+            <h6><em>by Matt Chapman</em></h6>
+            <br />
+            <p>Thanks to <code>frankfurter.dev</code> for the currency rates and <code>openstreetmap.org</code> for the location information.</p>
+            <br />
 						<Accordion className="app-info">
 							<AccordionItem title="App Info">
 								<ul>
